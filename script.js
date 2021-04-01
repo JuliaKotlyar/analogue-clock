@@ -3,12 +3,14 @@ const ctx = canvas.getContext('2d'); // create a 2D drawing object for the canva
 let radius = canvas.height / 2; // calculate the clock radius
 ctx.translate(radius, radius); // position of the object (center)
 radius *= 0.9;
+setInterval(drawClock, 1000); //start clock tik-tik
 
 // draw the clock face
 
 function drawClock() {
     drawFace(ctx, radius);
     drawNumbers(ctx, radius);
+    drawTime(ctx, radius);
 }
 
 function drawFace(ctx, radius) {
@@ -29,7 +31,6 @@ function drawFace(ctx, radius) {
     ctx.fillStyle = '#333';
     ctx.fill();
 }
-drawClock();
 
 // draw numbers
 
@@ -41,7 +42,7 @@ function drawNumbers(ctx, radius) {
     ctx.textAlign = 'center';
     for (num = 1; num < 13; num++) {
         ang = (num * Math.PI) / 6;
-        ctx.rotate(ang);
+        ctx.rotate(ang); // add rotation(turning), ang (rotation angle clockwise)
         ctx.translate(0, -radius * 0.85);
         ctx.rotate(-ang);
         ctx.fillText(num.toString(), 0, 0);
@@ -49,4 +50,42 @@ function drawNumbers(ctx, radius) {
         ctx.translate(0, radius * 0.85);
         ctx.rotate(-ang);
     }
+}
+
+// draw time
+
+function drawTime(ctx, radius) {
+    let now = new Date();
+    let hour = now.getHours();
+    let minute = now.getMinutes();
+    let second = now.getSeconds();
+
+    //hour
+
+    hour = hour % 12;
+    hour = (hour * Math.PI) / 6 + (minute * Math.PI) / (6 * 60) + (second * Math.PI) / (360 * 60);
+    drawHand(ctx, hour, radius * 0.5, radius * 0.07);
+
+    //minutes
+
+    minute = ((minute * Math.PI) / 30) * ((second * Math.PI) / (30 * 60));
+    drawHand(ctx, minute, radius * 0.8, radius * 0.07);
+
+    //seconds
+
+    second = (second * Math.PI) / 30;
+    drawHand(ctx, second, radius * 0.9, radius * 0.02);
+}
+
+//draw hands
+
+function drawHand(ctx, position, length, width) {
+    ctx.beginPath();
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.moveTo(0, 0);
+    ctx.rotate(position);
+    ctx.lineTo(0, -length);
+    ctx.stroke();
+    ctx.rotate(-position);
 }
